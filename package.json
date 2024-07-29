@@ -9,11 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "firebase": "^10.12.4",
+    "framer-motion": "^11.3.19",
+    "lucide-react": "^0.417.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "shadcn": "^1.0.0"
+    "shadcn": "^1.0.0",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
