@@ -1,7 +1,7 @@
 // context/PantryContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, addDoc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from 'firebase/firestore';
 
 const PantryContext = createContext();
 
@@ -18,15 +18,27 @@ export const PantryProvider = ({ children }) => {
   }, []);
 
   const addItem = async (item) => {
-    await addDoc(collection(db, 'pantry'), item);
+    try {
+      await addDoc(collection(db, 'pantry'), item);
+    } catch (error) {
+      console.error("Error adding item: ", error);
+    }
   };
 
   const deleteItem = async (id) => {
-    await deleteDoc(doc(db, 'pantry', id));
+    try {
+      await deleteDoc(doc(db, 'pantry', id));
+    } catch (error) {
+      console.error("Error deleting item: ", error);
+    }
   };
 
   const updateItem = async (id, updatedItem) => {
-    await updateDoc(doc(db, 'pantry', id), updatedItem);
+    try {
+      await updateDoc(doc(db, 'pantry', id), updatedItem);
+    } catch (error) {
+      console.error("Error updating item: ", error);
+    }
   };
 
   return (

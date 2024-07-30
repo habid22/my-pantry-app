@@ -1,17 +1,31 @@
 // firebaseConfig.js
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+// Optionally import analytics if you're using it
+// import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyD8tCDyOEqVFM5Y9r9wuYZqMWeVBFs4mH8",
+  authDomain: "pantry-tracker-3386c.firebaseapp.com",
+  projectId: "pantry-tracker-3386c",
+  storageBucket: "pantry-tracker-3386c.appspot.com",
+  messagingSenderId: "806576915022",
+  appId: "1:806576915022:web:8f1a519a06a303e065791f",
+  measurementId: "G-6Z3KW5L8FN"
 };
 
-const app = initializeApp(firebaseConfig);
+// Check if the Firebase app is already initialized
+let app;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+  // Initialize analytics if needed
+  // if (typeof window !== 'undefined') {
+  //   getAnalytics(app);
+  // }
+} else {
+  app = getApp(); // Use the existing app instance
+}
+
 const db = getFirestore(app);
 
 export { db };

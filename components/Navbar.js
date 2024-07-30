@@ -9,12 +9,7 @@ const MyNavbar = () => {
           Pantry Manager
         </Heading>
         <Flex alignItems={"center"}>
-          <Link href="/" p={2} color="white">
-            Home
-          </Link>
-          <Link href="/about" p={2} color="white">
-            About
-          </Link>
+    
         </Flex>
       </Flex>
     </Box>

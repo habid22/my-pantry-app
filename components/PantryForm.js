@@ -9,6 +9,7 @@ const PantryForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (name.trim() === '') return; // Prevent adding empty items
     addItem({ name });
     setName('');
   };
