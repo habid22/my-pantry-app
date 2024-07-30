@@ -19,6 +19,7 @@ const Home = () => {
           <SearchBar />
           <Box ml={2}>
             <SortingDropdown />
+            ‎
           </Box>
         </Flex>
         <Box display="flex" justifyContent="center" mb={4}>
