@@ -1,7 +1,7 @@
 // context/PantryContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, getDocs, getDoc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 
 const PantryContext = createContext();
 
@@ -10,34 +10,57 @@ export const usePantry = () => useContext(PantryContext);
 export const PantryProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortMethod, setSortMethod] = useState('name-asc');
   const [filteredItems, setFilteredItems] = useState([]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'pantry'), (snapshot) => {
       const allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setItems(allItems);
-      filterItems(allItems, searchQuery);
     });
     return unsub;
-  }, [searchQuery]);
+  }, []);
 
-  const filterItems = (items, query) => {
-    if (!query) {
-      setFilteredItems(items);
-    } else {
-      setFilteredItems(
-        items.filter(item =>
-          item.name.toLowerCase().includes(query.toLowerCase())
-        )
+  useEffect(() => {
+    filterAndSortItems();
+  }, [items, searchQuery, sortMethod]);
+
+  const filterAndSortItems = () => {
+    let filtered = [...items];
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
+    // Sort items based on the selected method
+    if (sortMethod === 'name-asc') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortMethod === 'quantity-asc') {
+      filtered.sort((a, b) => a.quantity - b.quantity);
+    }
+
+    setFilteredItems(filtered);
   };
 
-  const addItem = async (item) => {
+
+  const addItem = async (newItem) => {
     try {
-      await addDoc(collection(db, 'pantry'), item);
+      const itemQuery = query(collection(db, 'pantry'), where("name", "==", newItem.name));
+      const snapshot = await getDocs(itemQuery);
+      if (!snapshot.empty) {
+        // Item exists, update the quantity
+        const existingItem = snapshot.docs[0];
+        const newQuantity = existingItem.data().quantity + 1;
+        await updateDoc(doc(db, 'pantry', existingItem.id), { quantity: newQuantity });
+      } else {
+        // Item doesn't exist, add new item with quantity 1
+        await addDoc(collection(db, 'pantry'), { ...newItem, quantity: 1 });
+      }
     } catch (error) {
-      console.error("Error adding item: ", error);
+      console.error("Error adding/updating item: ", error);
     }
   };
 
@@ -57,8 +80,42 @@ export const PantryProvider = ({ children }) => {
     }
   };
 
-  return (
-    <PantryContext.Provider value={{ items, filteredItems, addItem, deleteItem, updateItem, setSearchQuery }}>
+  const incrementItemQuantity = async (id) => {
+    try {
+      const itemDoc = doc(db, 'pantry', id);
+      const itemSnapshot = await getDoc(itemDoc);
+      const currentQuantity = itemSnapshot.data().quantity || 0;
+      await updateDoc(itemDoc, { quantity: currentQuantity + 1 });
+    } catch (error) {
+      console.error("Error incrementing quantity: ", error);
+    }
+  };
+
+  const decrementItemQuantity = async (id) => {
+    try {
+      const itemDoc = doc(db, 'pantry', id);
+      const itemSnapshot = await getDoc(itemDoc);
+      const currentQuantity = itemSnapshot.data().quantity || 0;
+      if (currentQuantity > 0) {
+        await updateDoc(itemDoc, { quantity: currentQuantity - 1 });
+      }
+    } catch (error) {
+      console.error("Error decrementing quantity: ", error);
+    }
+  };
+
+   return (
+    <PantryContext.Provider value={{
+      items,
+      filteredItems,
+      addItem,
+      deleteItem,
+      updateItem,
+      incrementItemQuantity,
+      decrementItemQuantity,
+      setSearchQuery,
+      setSortMethod
+    }}>
       {children}
     </PantryContext.Provider>
   );

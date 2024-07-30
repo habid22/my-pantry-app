@@ -1,9 +1,10 @@
 // components/PantryItem.js
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, IconButton, Flex } from "@chakra-ui/react";
+import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { usePantry } from '../context/PantryContext';
 
 const PantryItem = ({ item }) => {
-  const { deleteItem, updateItem } = usePantry();
+  const { deleteItem, updateItem, incrementItemQuantity, decrementItemQuantity } = usePantry();
 
   const handleDelete = () => {
     deleteItem(item.id);
@@ -16,13 +17,41 @@ const PantryItem = ({ item }) => {
     }
   };
 
+  const handleIncrement = () => {
+    incrementItemQuantity(item.id);
+  };
+
+  const handleDecrement = () => {
+    decrementItemQuantity(item.id);
+  };
+
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg">
-      <Heading as="h3" size="lg">{item.name}</Heading>
-      <Text mt={4}>
-        <Button colorScheme="red" onClick={handleDelete}>Delete</Button>
-        <Button ml={2} onClick={handleUpdate}>Edit</Button>
-      </Text>
+    <Box p={4} borderWidth="1px" borderRadius="lg" display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+      <Box mb={4}>
+        <Heading as="h3" size="lg">{item.name}</Heading>
+        <Text mt={2}>Quantity: {item.quantity}</Text>
+      </Box>
+      <Flex justifyContent="space-between" mt={4} alignItems="center">
+        <Flex>
+          <IconButton
+            aria-label="Add item"
+            icon={<AddIcon />}
+            onClick={handleIncrement}
+            colorScheme="green"
+            size="sm"
+            mr={2}
+          />
+          <IconButton
+            aria-label="Remove item"
+            icon={<MinusIcon />}
+            onClick={handleDecrement}
+            colorScheme="yellow"
+            size="sm"
+          />
+        </Flex>
+        <Button colorScheme="red" onClick={handleDelete} ml={2} size="sm">Delete</Button>
+        <Button onClick={handleUpdate} ml={2} size="sm">Edit</Button>
+      </Flex>
     </Box>
   );
 };
