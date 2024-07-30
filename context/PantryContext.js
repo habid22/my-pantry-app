@@ -9,13 +9,29 @@ export const usePantry = () => useContext(PantryContext);
 
 export const PantryProvider = ({ children }) => {
   const [items, setItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredItems, setFilteredItems] = useState([]);
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'pantry'), (snapshot) => {
-      setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setItems(allItems);
+      filterItems(allItems, searchQuery);
     });
     return unsub;
-  }, []);
+  }, [searchQuery]);
+
+  const filterItems = (items, query) => {
+    if (!query) {
+      setFilteredItems(items);
+    } else {
+      setFilteredItems(
+        items.filter(item =>
+          item.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+  };
 
   const addItem = async (item) => {
     try {
@@ -42,7 +58,7 @@ export const PantryProvider = ({ children }) => {
   };
 
   return (
-    <PantryContext.Provider value={{ items, addItem, deleteItem, updateItem }}>
+    <PantryContext.Provider value={{ items, filteredItems, addItem, deleteItem, updateItem, setSearchQuery }}>
       {children}
     </PantryContext.Provider>
   );

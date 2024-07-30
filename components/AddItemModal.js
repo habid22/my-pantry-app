@@ -22,7 +22,7 @@ const AddItemModal = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.trim() === '') return; // Prevent adding empty items
+    if (name.trim() === '') return;
     addItem({ name });
     setName('');
     onClose();

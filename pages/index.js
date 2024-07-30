@@ -2,6 +2,7 @@
 import MyNavbar from '../components/Navbar';
 import PantryList from '../components/PantryList';
 import AddItemModal from '../components/AddItemModal';
+import SearchBar from '../components/SearchBar';
 import { PantryProvider } from '../context/PantryContext';
 import { Box, Container, Heading, Flex } from "@chakra-ui/react";
 
@@ -14,6 +15,7 @@ const Home = () => {
           <Heading mb={4} textAlign="center">
             Pantry Management
           </Heading>
+          <SearchBar />
           <AddItemModal />
         </Flex>
         <PantryList />
