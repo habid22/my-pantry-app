@@ -13,7 +13,8 @@ const Home = () => {
       <MyNavbar />
       <Container maxW="container.md" mt={5}>
         <Heading mb={4} textAlign="center">
-          Pantry Management
+          Your Current Pantry 🥫🚪
+          ‎
         </Heading>
         <Flex mb={4} align="center">
           <SearchBar />

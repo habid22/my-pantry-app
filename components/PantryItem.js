@@ -2,19 +2,13 @@
 import { Box, Button, Heading, Text, IconButton, Flex } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { usePantry } from '../context/PantryContext';
+import EditItemModal from './EditItemModal';
 
 const PantryItem = ({ item }) => {
-  const { deleteItem, updateItem, incrementItemQuantity, decrementItemQuantity } = usePantry();
+  const { deleteItem, incrementItemQuantity, decrementItemQuantity } = usePantry();
 
   const handleDelete = () => {
     deleteItem(item.id);
-  };
-
-  const handleUpdate = () => {
-    const updatedName = prompt("Enter new name", item.name);
-    if (updatedName && updatedName.trim() !== '') {
-      updateItem(item.id, { name: updatedName });
-    }
   };
 
   const handleIncrement = () => {
@@ -26,12 +20,21 @@ const PantryItem = ({ item }) => {
   };
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg" display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+    <Box
+      p={4}
+      borderWidth="1px"
+      borderRadius="lg"
+      display="flex"
+      flexDirection="column"
+      justifyContent="space-between"
+      height="200px"
+      maxW="300px"
+    >
       <Box mb={4}>
-        <Heading as="h3" size="lg">{item.name}</Heading>
+        <Heading as="h3" size="md">{item.name}</Heading>
         <Text mt={2}>Quantity: {item.quantity}</Text>
       </Box>
-      <Flex justifyContent="space-between" mt={4} alignItems="center">
+      <Flex justifyContent="space-between" alignItems="center">
         <Flex>
           <IconButton
             aria-label="Add item"
@@ -50,7 +53,7 @@ const PantryItem = ({ item }) => {
           />
         </Flex>
         <Button colorScheme="red" onClick={handleDelete} ml={2} size="sm">Delete</Button>
-        <Button onClick={handleUpdate} ml={2} size="sm">Edit</Button>
+        <EditItemModal item={item} />
       </Flex>
     </Box>
   );

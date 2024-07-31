@@ -1,7 +1,7 @@
 // context/PantryContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, onSnapshot, query, where, getDocs, getDoc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, getDocs, getDoc, updateDoc, addDoc, deleteDoc, doc } from 'firebase/firestore';
 
 const PantryContext = createContext();
 
@@ -36,15 +36,22 @@ export const PantryProvider = ({ children }) => {
     }
 
     // Sort items based on the selected method
-    if (sortMethod === 'name-asc') {
-      filtered.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortMethod === 'quantity-asc') {
-      filtered.sort((a, b) => a.quantity - b.quantity);
+    switch (sortMethod) {
+      case 'name-asc':
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'quantity-asc':
+        filtered.sort((a, b) => a.quantity - b.quantity);
+        break;
+      case 'quantity-desc':
+        filtered.sort((a, b) => b.quantity - a.quantity);
+        break;
+      default:
+        break;
     }
 
     setFilteredItems(filtered);
   };
-
 
   const addItem = async (newItem) => {
     try {
@@ -82,10 +89,12 @@ export const PantryProvider = ({ children }) => {
 
   const incrementItemQuantity = async (id) => {
     try {
-      const itemDoc = doc(db, 'pantry', id);
-      const itemSnapshot = await getDoc(itemDoc);
-      const currentQuantity = itemSnapshot.data().quantity || 0;
-      await updateDoc(itemDoc, { quantity: currentQuantity + 1 });
+      const itemRef = doc(db, 'pantry', id);
+      const itemSnapshot = await getDoc(itemRef);
+      if (itemSnapshot.exists()) {
+        const currentQuantity = itemSnapshot.data().quantity || 0;
+        await updateDoc(itemRef, { quantity: currentQuantity + 1 });
+      }
     } catch (error) {
       console.error("Error incrementing quantity: ", error);
     }
@@ -93,18 +102,20 @@ export const PantryProvider = ({ children }) => {
 
   const decrementItemQuantity = async (id) => {
     try {
-      const itemDoc = doc(db, 'pantry', id);
-      const itemSnapshot = await getDoc(itemDoc);
-      const currentQuantity = itemSnapshot.data().quantity || 0;
-      if (currentQuantity > 0) {
-        await updateDoc(itemDoc, { quantity: currentQuantity - 1 });
+      const itemRef = doc(db, 'pantry', id);
+      const itemSnapshot = await getDoc(itemRef);
+      if (itemSnapshot.exists()) {
+        const currentQuantity = itemSnapshot.data().quantity || 0;
+        if (currentQuantity > 0) {
+          await updateDoc(itemRef, { quantity: currentQuantity - 1 });
+        }
       }
     } catch (error) {
       console.error("Error decrementing quantity: ", error);
     }
   };
 
-   return (
+  return (
     <PantryContext.Provider value={{
       items,
       filteredItems,
