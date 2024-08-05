@@ -1,4 +1,4 @@
-# Pantry Management System
+# Pantry Management System 🥫
 
 ## Link: https://my-pantry-app-phi.vercel.app/
 
